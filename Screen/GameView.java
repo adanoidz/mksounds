@@ -52,4 +52,8 @@ public class GameView extends SurfaceView implements ActivityLifeCycle, View.OnT
 	public void run() {
 
 	}
+
+	public void onBackPressed(){
+		android.os.Process.killProcess(android.os.Process.myPid());
+	}
 }

@@ -9,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Color;
 import android.media.MediaPlayer;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -36,8 +35,9 @@ public class MortalKombat extends GameView implements Runnable {
 	private MediaPlayer media;
 	private Paint textPaint;
 	private String lastCharacter;
-	private int lastCharacterIndex;
+	private int currentCharacterIndex, previousCharacterIndex;
 	private boolean startScreen;
+	
 
 	private int WIDTH, HEIGHT;
 
@@ -69,6 +69,8 @@ public class MortalKombat extends GameView implements Runnable {
 		sprites = new Sprite[names.length];
 		nameSoundsId = new int[names.length];
 		AssetManager am = context.getAssets();
+		currentCharacterIndex = -1;
+		previousCharacterIndex = -1;
 
 		for (int i = 0; i < names.length; i++) {
 			// get value name of array item, hard-coded so language is not important!
@@ -96,10 +98,7 @@ public class MortalKombat extends GameView implements Runnable {
 	private void render() {
 		Canvas canvas = holder.lockCanvas();
 		canvas.drawRGB(125, 125, 125);
-		//canvas.drawText(lastCharacter, 0, canvas.getHeight() / 2, textPaint);
-		//canvas.drawText(WIDTH + " x " + HEIGHT, canvas.getWidth() / 2, canvas.getHeight() / 2, textPaint);
 		drawGrid(canvas);
-		//canvas.drawBitmap(sprites[lastCharacterIndex].getBitmap(), 0, 0, null);
 
 		holder.unlockCanvasAndPost(canvas);
 
@@ -152,7 +151,7 @@ public class MortalKombat extends GameView implements Runnable {
 	private int randomCharacter(){
 		int num = random.nextInt(nameSoundsId.length);
 		lastCharacter = names[num];
-		lastCharacterIndex = num;
+		currentCharacterIndex = num;
 		return num;
 	}
 
@@ -163,8 +162,11 @@ public class MortalKombat extends GameView implements Runnable {
 		boolean faceTouched = false;
 		for(int i = 0; i < names.length; i++){
 			if(sprites[i].getRect().contains((int) e.getX(), (int) e.getY())){
+				if(previousCharacterIndex == -1) previousCharacterIndex = i;
+				previousCharacterIndex = currentCharacterIndex;
+
 				lastCharacter = names[i];
-				lastCharacterIndex = i;
+				currentCharacterIndex = i;
 				faceTouched = true;
 				break;
 			}
@@ -173,11 +175,12 @@ public class MortalKombat extends GameView implements Runnable {
 		switch (action) {
 			case MotionEvent.ACTION_UP:
 				if(faceTouched){
-					audio.playSound(nameSoundsId[lastCharacterIndex], 1);
+					audio.playSound(nameSoundsId[currentCharacterIndex], 1);
 				}
 				break;
 		}
 
 		return true;
 	}
+
 }

@@ -97,6 +97,10 @@ public class Audio {
 		soundPool.play(id, volume, volume, 0, 0, 1);
 	}
 
+	public void stopSound(int id){
+		soundPool.stop(id);
+	}
+
 	/**
 	 * General use pause method to safely pause and resume all media types at once,
 	 * for instance when a popup or ad is displayed
