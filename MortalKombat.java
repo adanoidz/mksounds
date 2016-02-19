@@ -14,7 +14,7 @@ import android.view.SurfaceHolder;
 import android.view.View;
 
 import com.adanoidz.surfaceviewtest.Audio.Audio;
-import com.adanoidz.surfaceviewtest.Graphics.Sprite;
+import com.adanoidz.surfaceviewtest.Graphics.Portrait;
 import com.adanoidz.surfaceviewtest.Screen.GameView;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 	// Fields
 	private int gridPosition;
 	private String[] names;
-	private Sprite[] sprites;
+	private Portrait[] sprites;
 	private int[] nameSoundsId;
 	private Thread thread;
 	private boolean running;
@@ -44,7 +44,7 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 	private int WIDTH, HEIGHT;
 
 
-	Sprite portrait;
+	Portrait portrait;
 
 	public MortalKombat(Activity activity, Context context, Audio audioIn) {
 		super(activity, context, audioIn);
@@ -73,7 +73,7 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 
 	private void init() {
 		names = context.getResources().getStringArray(R.array.mkCharacterNames);
-		sprites = new Sprite[names.length];
+		sprites = new Portrait[names.length];
 		nameSoundsId = new int[names.length];
 		AssetManager am = context.getAssets();
 		currentCharacterIndex = -1;
@@ -86,7 +86,7 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 			// Load graphics to Sprites
 			try {
 				Bitmap tempB = BitmapFactory.decodeStream(am.open("images/" + fileName + ".png"));
-				sprites[i] = new Sprite(tempB);
+				sprites[i] = new Portrait(tempB);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -123,18 +123,18 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 	}
 
 	private void render() {
-		Canvas canvas = holder.lockCanvas();
-		canvas.drawRGB(125, 125, 125);
-		drawGrid(canvas);
-		highlight.render(canvas);
+		Canvas c = holder.lockCanvas();
+		c.drawRGB(125, 125, 125);
+		drawGrid(c);
+		highlight.render(c);
 
-		holder.unlockCanvasAndPost(canvas);
+		holder.unlockCanvasAndPost(c);
 
 	}
 
 	private void drawGrid(Canvas c){
 		for(int i = 0; i < sprites.length; i++){
-			c.drawBitmap(sprites[i].getBitmap(), sprites[i].getRect().left, sprites[i].getRect().top, null);
+			sprites[i].render(c);
 		}
 	}
 

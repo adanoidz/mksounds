@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 
-public class Sprite implements Renderable{
+public class Portrait implements Renderable{
 
 
 	Bitmap bitmap;
@@ -12,7 +12,7 @@ public class Sprite implements Renderable{
 	boolean visible;
 	Rect bounds;
 
-	public Sprite(Bitmap b){
+	public Portrait(Bitmap b){
 		//TODO Remove this scaling when you can stretch an image that is rendered
 		bitmap = Bitmap.createScaledBitmap(b, b.getWidth() * 3, b.getHeight() * 3, false);
 		width = bitmap.getWidth();
