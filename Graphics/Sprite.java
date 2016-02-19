@@ -1,6 +1,7 @@
 package com.adanoidz.surfaceviewtest.Graphics;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Rect;
 
 public class Sprite implements Renderable{
@@ -31,7 +32,8 @@ public class Sprite implements Renderable{
 	}
 
 	@Override
-	public void render(Render s) {
+	public void render(Canvas canvas) {
+		canvas.drawBitmap(bitmap, bounds.left, bounds.top, null);
 	}
 
 	public void setRect(int x, int y){

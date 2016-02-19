@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Random;
 
 
-public class MortalKombat extends GameView implements Runnable {
+public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Callback {
 
 	Random random;
 	// Fields
@@ -37,7 +37,9 @@ public class MortalKombat extends GameView implements Runnable {
 	private String lastCharacter;
 	private int currentCharacterIndex, previousCharacterIndex;
 	private boolean startScreen;
-	
+	private Highlight highlight;
+	private boolean surfaceCreated;
+
 
 	private int WIDTH, HEIGHT;
 
@@ -49,17 +51,22 @@ public class MortalKombat extends GameView implements Runnable {
 		audio.createSoundPool(20);
 
 		holder = getHolder();
+		holder.addCallback(this);
 		random = new Random();
 		setOnTouchListener(this);
 
 		textPaint = new Paint();
 		textPaint.setColor(Color.WHITE);
+
+		highlight = new Highlight(Color.GREEN);
+		init();
 	}
 
 	@Override
 	public void run() {
-		init();
+		populateGrid();
 		while (running) {
+			update();
 			render();
 		}
 	}
@@ -90,34 +97,44 @@ public class MortalKombat extends GameView implements Runnable {
 		media = audio.createMusic("sounds/playerSelect.wav", false, true);
 		media.setVolume(0.5f, 0.5f);
 		media.start();
+	}
 
+	private void populateGrid(){
 		WIDTH = holder.getSurfaceFrame().width();
 		HEIGHT = holder.getSurfaceFrame().height();
+
+		int spriteHeight = sprites[0].getBitmap().getHeight();
+		int spriteWidth = sprites[0].getBitmap().getWidth();
+
+		int leftX = (int) (WIDTH/2 - (spriteWidth * 2.5));
+		int topY = (int) (HEIGHT/2 - (spriteHeight * 1.5));
+
+
+		for(int y = 0; y < 3; y++){
+			for(int x = 0; x < 5; x++){
+				sprites[x + (y * 5)].setRect(leftX + (x * spriteWidth), topY + (y * spriteHeight));
+
+			}
+		}
+	}
+
+	private void update(){
+		highlight.update();
 	}
 
 	private void render() {
 		Canvas canvas = holder.lockCanvas();
 		canvas.drawRGB(125, 125, 125);
 		drawGrid(canvas);
+		highlight.render(canvas);
 
 		holder.unlockCanvasAndPost(canvas);
 
 	}
 
 	private void drawGrid(Canvas c){
-		int spriteHeight = sprites[0].getBitmap().getHeight();
-		int spriteWidth = sprites[0].getBitmap().getWidth();
-
-		int leftX = (int) (c.getWidth()/2 - (spriteWidth * 2.5));
-		int topY = (int) (c.getHeight()/2 - (spriteHeight * 1.5));
-
-
-		for(int y = 0; y < 3; y++){
-			for(int x = 0; x < 5; x++){
-				sprites[x + (y * 5)].setRect(leftX + (x * spriteWidth), topY + (y * spriteHeight));
-				c.drawBitmap(sprites[x + (y * 5)].getBitmap(), leftX + (x * spriteWidth),
-						topY + (y * spriteHeight), null);
-			}
+		for(int i = 0; i < sprites.length; i++){
+			c.drawBitmap(sprites[i].getBitmap(), sprites[i].getRect().left, sprites[i].getRect().top, null);
 		}
 	}
 
@@ -127,6 +144,7 @@ public class MortalKombat extends GameView implements Runnable {
 		if (thread != null) {
 			try {
 				thread.join();
+				thread = null;
 			} catch (InterruptedException e) {
 				// retry
 			}
@@ -140,11 +158,13 @@ public class MortalKombat extends GameView implements Runnable {
 
 	@Override
 	public void onResume() {
-		running = true;
+			running = true;
 
 		if (thread == null) {
 			thread = new Thread(this);
-			thread.start();
+			if(surfaceCreated){
+				thread.start();
+			}
 		}
 	}
 
@@ -168,6 +188,9 @@ public class MortalKombat extends GameView implements Runnable {
 				lastCharacter = names[i];
 				currentCharacterIndex = i;
 				faceTouched = true;
+				if(currentCharacterIndex != previousCharacterIndex){
+					highlight.setBounds(sprites[i].getRect());
+				}
 				break;
 			}
 		}
@@ -183,4 +206,20 @@ public class MortalKombat extends GameView implements Runnable {
 		return true;
 	}
 
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		running = true;
+		surfaceCreated = true;
+		thread.start();
+	}
+
+	@Override
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+	}
+
+	@Override
+	public void surfaceDestroyed(SurfaceHolder holder) {
+
+	}
 }
