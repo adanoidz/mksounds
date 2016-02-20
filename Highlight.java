@@ -1,11 +1,10 @@
-package com.adanoidz.surfaceviewtest;
+package com.adanoidz.mortalkombatsounds;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import com.adanoidz.surfaceviewtest.Graphics.Render;
-import com.adanoidz.surfaceviewtest.Graphics.Renderable;
+import com.adanoidz.mortalkombatsounds.Graphics.Renderable;
 
 public class Highlight implements Renderable{
 
@@ -65,8 +64,8 @@ public class Highlight implements Renderable{
 		if(frameCounter <= 0)grow = true;
 
 		if(frameCounter % 5 == 0){
-			int percent = (frameCounter / 5) * 10;
-			paint.setAlpha(percent);
+			int alpha = (frameCounter / 5) * 18;
+			paint.setAlpha(alpha);
 		}
 	}
 

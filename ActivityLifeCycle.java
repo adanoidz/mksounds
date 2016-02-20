@@ -1,4 +1,4 @@
-package com.adanoidz.surfaceviewtest;
+package com.adanoidz.mortalkombatsounds;
 
 
 public interface ActivityLifeCycle {

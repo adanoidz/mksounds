@@ -1,4 +1,4 @@
-package com.adanoidz.surfaceviewtest;
+package com.adanoidz.mortalkombatsounds;
 
 import android.app.Activity;
 import android.media.AudioManager;
@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import com.adanoidz.surfaceviewtest.Audio.Audio;
-import com.adanoidz.surfaceviewtest.Screen.GameView;
+import com.adanoidz.mortalkombatsounds.Audio.Audio;
+import com.adanoidz.mortalkombatsounds.Screen.GameView;
 
 public class MainActivity extends Activity {
 

@@ -1,4 +1,4 @@
-package com.adanoidz.surfaceviewtest.Graphics;
+package com.adanoidz.mortalkombatsounds.Graphics;
 
 import android.content.Context;
 

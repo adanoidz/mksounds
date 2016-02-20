@@ -1,4 +1,4 @@
-package com.adanoidz.surfaceviewtest;
+package com.adanoidz.mortalkombatsounds;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,9 +13,9 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 
-import com.adanoidz.surfaceviewtest.Audio.Audio;
-import com.adanoidz.surfaceviewtest.Graphics.Portrait;
-import com.adanoidz.surfaceviewtest.Screen.GameView;
+import com.adanoidz.mortalkombatsounds.Audio.Audio;
+import com.adanoidz.mortalkombatsounds.Graphics.Portrait;
+import com.adanoidz.mortalkombatsounds.Screen.GameView;
 
 import java.io.IOException;
 import java.util.Random;
@@ -79,6 +79,11 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 		currentCharacterIndex = -1;
 		previousCharacterIndex = -1;
 
+		int width = context.getResources().getDisplayMetrics().widthPixels;
+		int height = context.getResources().getDisplayMetrics().heightPixels;
+		int scaleY = (int) (height * 0.8) / 3;
+		double scale = 0;
+
 		for (int i = 0; i < names.length; i++) {
 			// get value name of array item, hard-coded so language is not important!
 			String fileName = context.getResources().getStringArray(R.array.mkSoundFileNames)[i];
@@ -86,7 +91,10 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 			// Load graphics to Sprites
 			try {
 				Bitmap tempB = BitmapFactory.decodeStream(am.open("images/" + fileName + ".png"));
-				sprites[i] = new Portrait(tempB);
+				if(scale == 0){
+					scale = scaleY / tempB.getHeight();
+				}
+				sprites[i] = new Portrait(tempB, scale);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

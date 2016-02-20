@@ -1,4 +1,4 @@
-package com.adanoidz.surfaceviewtest.Screen;
+package com.adanoidz.mortalkombatsounds.Screen;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,8 +6,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 
-import com.adanoidz.surfaceviewtest.ActivityLifeCycle;
-import com.adanoidz.surfaceviewtest.Audio.Audio;
+import com.adanoidz.mortalkombatsounds.ActivityLifeCycle;
+import com.adanoidz.mortalkombatsounds.Audio.Audio;
 
 public class GameView extends SurfaceView implements ActivityLifeCycle, View.OnTouchListener, Runnable{
 

@@ -1,4 +1,4 @@
-package com.adanoidz.surfaceviewtest.Graphics;
+package com.adanoidz.mortalkombatsounds.Graphics;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,14 +10,16 @@ public class Portrait implements Renderable{
 	Bitmap bitmap;
 	int width, height;
 	boolean visible;
+	private double scale;
 	Rect bounds;
 
-	public Portrait(Bitmap b){
+	public Portrait(Bitmap b, double scale){
 		//TODO Remove this scaling when you can stretch an image that is rendered
-		bitmap = Bitmap.createScaledBitmap(b, b.getWidth() * 3, b.getHeight() * 3, false);
+		bitmap = Bitmap.createScaledBitmap(b, (int) (b.getWidth() * scale), (int) (b.getHeight() * scale), false);
 		width = bitmap.getWidth();
 		height = bitmap.getHeight();
 
+		this.scale = scale;
 
 		visible = true;
 	}
