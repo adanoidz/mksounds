@@ -14,6 +14,7 @@ import android.view.SurfaceHolder;
 import android.view.View;
 
 import com.adanoidz.mortalkombatsounds.Audio.Audio;
+import com.adanoidz.mortalkombatsounds.Graphics.DanForden;
 import com.adanoidz.mortalkombatsounds.Graphics.Portrait;
 import com.adanoidz.mortalkombatsounds.Screen.GameView;
 
@@ -28,6 +29,7 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 	private int gridPosition;
 	private String[] names;
 	private Portrait[] sprites;
+
 	private int[] nameSoundsId;
 	private Thread thread;
 	private boolean running;
@@ -40,7 +42,15 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 	private Highlight highlight;
 	private boolean surfaceCreated;
 
+	// Dan Forden Fields
+	private DanForden danForden;
+	private boolean isDanToasty;
+	private int danCounter;
+	private final int DAN_RANDOM = 25;
+	private int danToastySound;
 
+
+	// Surface size from display metrics
 	private int WIDTH, HEIGHT;
 
 
@@ -91,7 +101,7 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 			// Load graphics to Sprites
 			try {
 				Bitmap tempB = BitmapFactory.decodeStream(am.open("images/" + fileName + ".png"));
-				if(scale == 0){
+				if (scale == 0) {
 					scale = scaleY / tempB.getHeight();
 				}
 				sprites[i] = new Portrait(tempB, scale);
@@ -99,35 +109,58 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 				e.printStackTrace();
 			}
 
-			randomCharacter();
+
+
+		}
+
+
+		// Load Dan Forden Graphics
+		try {
+			danForden = new DanForden(BitmapFactory.decodeStream(am.open("images/dan_forden.png")), scale);
+		} catch (IOException e) {
 		}
 
 		media = audio.createMusic("sounds/playerSelect.wav", false, true);
-		media.setVolume(0.5f, 0.5f);
+		media.setVolume(0.3f, 0.3f);
 		media.start();
+
+
+		randomCharacter();
+		setupDan();
 	}
 
-	private void populateGrid(){
+	private void setupDan() {
+		danCounter = random.nextInt(DAN_RANDOM) + 1;
+		danForden.setRect(WIDTH, HEIGHT - danForden.getBitmap().getHeight());
+		isDanToasty = false;
+		if(danToastySound == 0){
+			danToastySound = audio.loadSoundFx("sounds/toasty.ogg");
+		}
+	}
+
+	private void populateGrid() {
 		WIDTH = holder.getSurfaceFrame().width();
 		HEIGHT = holder.getSurfaceFrame().height();
 
 		int spriteHeight = sprites[0].getBitmap().getHeight();
 		int spriteWidth = sprites[0].getBitmap().getWidth();
 
-		int leftX = (int) (WIDTH/2 - (spriteWidth * 2.5));
-		int topY = (int) (HEIGHT/2 - (spriteHeight * 1.5));
+		int leftX = (int) (WIDTH / 2 - (spriteWidth * 2.5));
+		int topY = (int) (HEIGHT / 2 - (spriteHeight * 1.5));
 
 
-		for(int y = 0; y < 3; y++){
-			for(int x = 0; x < 5; x++){
+		for (int y = 0; y < 3; y++) {
+			for (int x = 0; x < 5; x++) {
 				sprites[x + (y * 5)].setRect(leftX + (x * spriteWidth), topY + (y * spriteHeight));
-
 			}
 		}
+
+		danForden.setRect(WIDTH, HEIGHT - danForden.getBitmap().getHeight());
 	}
 
-	private void update(){
+	private void update() {
 		highlight.update();
+		danForden.update();
 	}
 
 	private void render() {
@@ -135,13 +168,14 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 		c.drawRGB(125, 125, 125);
 		drawGrid(c);
 		highlight.render(c);
+		danForden.render(c);
 
 		holder.unlockCanvasAndPost(c);
 
 	}
 
-	private void drawGrid(Canvas c){
-		for(int i = 0; i < sprites.length; i++){
+	private void drawGrid(Canvas c) {
+		for (int i = 0; i < sprites.length; i++) {
 			sprites[i].render(c);
 		}
 	}
@@ -166,17 +200,17 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 
 	@Override
 	public void onResume() {
-			running = true;
+		running = true;
 
 		if (thread == null) {
 			thread = new Thread(this);
-			if(surfaceCreated){
+			if (surfaceCreated) {
 				thread.start();
 			}
 		}
 	}
 
-	private int randomCharacter(){
+	private int randomCharacter() {
 		int num = random.nextInt(nameSoundsId.length);
 		lastCharacter = names[num];
 		currentCharacterIndex = num;
@@ -188,24 +222,36 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 		int action = e.getAction();
 
 		boolean faceTouched = false;
-		for(int i = 0; i < names.length; i++){
-			if(sprites[i].getRect().contains((int) e.getX(), (int) e.getY())){
-				if(previousCharacterIndex == -1) previousCharacterIndex = i;
-				previousCharacterIndex = currentCharacterIndex;
-
-				lastCharacter = names[i];
-				currentCharacterIndex = i;
-				faceTouched = true;
-				if(currentCharacterIndex != previousCharacterIndex){
-					highlight.setBounds(sprites[i].getRect());
-				}
-				break;
-			}
-		}
 
 		switch (action) {
 			case MotionEvent.ACTION_UP:
-				if(faceTouched){
+				// TODO Limit number of lookups to portraits by narrowing down search area
+				for (int i = 0; i < names.length; i++) {
+					if (sprites[i].getRect().contains((int) e.getX(), (int) e.getY())) {
+						if (previousCharacterIndex == -1) previousCharacterIndex = i;
+						previousCharacterIndex = currentCharacterIndex;
+
+						lastCharacter = names[i];
+						currentCharacterIndex = i;
+						faceTouched = true;
+						if (currentCharacterIndex != previousCharacterIndex) {
+							highlight.setBounds(sprites[i].getRect());
+						}
+
+
+						break;
+					}
+				}
+
+				// Handle Dan Forden event
+				danCounter--;
+				if (danCounter == 0) {
+					danForden.getToasty();
+					audio.playSound(danToastySound, 1); // TODO - Load this sound
+					setupDan();
+				}
+
+				if (faceTouched) {
 					audio.playSound(nameSoundsId[currentCharacterIndex], 1);
 				}
 				break;
@@ -222,12 +268,8 @@ public class MortalKombat extends GameView implements Runnable, SurfaceHolder.Ca
 	}
 
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-	}
+	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
 
 	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-
-	}
+	public void surfaceDestroyed(SurfaceHolder holder) {}
 }
